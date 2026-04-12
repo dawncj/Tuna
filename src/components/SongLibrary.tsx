@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SONGS, Song } from '@/src/constants';
 import { transposeLine } from '@/src/lib/chords';
-import { parseSongFromContent, getSongRecommendations, getSongContent, searchAndAddSong } from '@/src/services/geminiService';
 
 export default function SongLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,104 +62,6 @@ export default function SongLibrary() {
     setCustomSongs(updated);
     localStorage.setItem('custom_songs', JSON.stringify(updated));
     if (selectedSong?.id === id) setSelectedSong(null);
-  };
-
-  const handleImportFromUrl = async () => {
-    if (!importUrl) return;
-    setIsImporting(true);
-    setImportStatus("Connecting to website...");
-    try {
-      const fetchRes = await fetch('/api/fetch-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl })
-      });
-      
-      if (fetchRes.ok) {
-        setImportStatus("Analyzing page content...");
-        const { content } = await fetchRes.json();
-        const parsedSong = await parseSongFromContent(content);
-        
-        if (parsedSong.title && parsedSong.content) {
-          const song: Song = {
-            id: Date.now().toString(),
-            title: parsedSong.title,
-            artist: parsedSong.artist || 'Unknown',
-            tuning: parsedSong.tuning || 'Standard',
-            content: parsedSong.content
-          };
-          const updated = [...customSongs, song];
-          setCustomSongs(updated);
-          localStorage.setItem('custom_songs', JSON.stringify(updated));
-          setIsImportDialogOpen(false);
-          setImportUrl('');
-          setImportStatus(null);
-          return;
-        }
-      }
-
-      // Fallback: If fetch fails (e.g. 403) or parsing fails, try searching by URL content/metadata
-      setImportStatus("Site blocked. Using AI to find song details...");
-      const parsedSong = await searchAndAddSong(importUrl);
-      
-      if (parsedSong.title && parsedSong.content) {
-        const song: Song = {
-          id: Date.now().toString(),
-          title: parsedSong.title,
-          artist: parsedSong.artist || 'Unknown',
-          tuning: parsedSong.tuning || 'Standard',
-          content: parsedSong.content
-        };
-        const updated = [...customSongs, song];
-        setCustomSongs(updated);
-        localStorage.setItem('custom_songs', JSON.stringify(updated));
-        setIsImportDialogOpen(false);
-        setImportUrl('');
-        setImportStatus(null);
-      } else {
-        setImportStatus("Failed to find song details. Please try another URL.");
-      }
-    } catch (error) {
-      console.error("Import failed:", error);
-      setImportStatus("An error occurred during import.");
-    } finally {
-      setIsImporting(false);
-      setTimeout(() => setImportStatus(null), 3000);
-    }
-  };
-
-  const handleGetRecommendations = async () => {
-    setIsRecommending(true);
-    try {
-      const recs = await getSongRecommendations(allSongs);
-      setRecommendations(recs);
-    } catch (error) {
-      console.error("Recommendations failed:", error);
-    } finally {
-      setIsRecommending(false);
-    }
-  };
-
-  const handleAddRecommended = async (title: string, artist: string) => {
-    setAddingRecommended(`${title}-${artist}`);
-    try {
-      const content = await getSongContent(title, artist);
-      const song: Song = {
-        id: Date.now().toString(),
-        title,
-        artist,
-        tuning: 'Standard', // Default, content might specify
-        content
-      };
-      const updated = [...customSongs, song];
-      setCustomSongs(updated);
-      localStorage.setItem('custom_songs', JSON.stringify(updated));
-      setRecommendations(prev => prev.filter(r => r.title !== title));
-    } catch (error) {
-      console.error("Failed to add recommended song:", error);
-    } finally {
-      setAddingRecommended(null);
-    }
   };
 
   const formatContent = (content: string, transpose: number) => {
@@ -227,14 +128,14 @@ export default function SongLibrary() {
                           {importStatus}
                         </div>
                       )}
-                      <Button 
+                      {/* <Button 
                         onClick={handleImportFromUrl} 
                         disabled={isImporting}
                         className="bg-emerald-600 hover:bg-emerald-500 w-full"
                       >
                         {isImporting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Globe className="w-4 h-4 mr-2" />}
                         {isImporting ? 'Importing...' : 'Import Song'}
-                      </Button>
+                      </Button> */}
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -343,56 +244,6 @@ export default function SongLibrary() {
               ))}
             </div>
 
-            {/* Recommendations Section */}
-            <div className="mt-8 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-amber-500" />
-                  AI Recommendations
-                </h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-zinc-800 text-zinc-400 hover:text-amber-500"
-                  onClick={handleGetRecommendations}
-                  disabled={isRecommending}
-                >
-                  {isRecommending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                  {recommendations.length > 0 ? 'Refresh Suggestions' : 'Get Recommendations'}
-                </Button>
-              </div>
-
-              {recommendations.length > 0 && (
-                <div className="grid grid-cols-1 gap-3">
-                  {recommendations.map((rec, idx) => (
-                    <Card key={idx} className="bg-zinc-900/50 border-zinc-800 border-dashed">
-                      <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-zinc-100">{rec.title}</span>
-                            <span className="text-zinc-500 text-sm">— {rec.artist}</span>
-                          </div>
-                          <p className="text-xs text-zinc-500 italic">{rec.reason}</p>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="bg-amber-600 hover:bg-amber-500"
-                          onClick={() => handleAddRecommended(rec.title, rec.artist)}
-                          disabled={addingRecommended === `${rec.title}-${rec.artist}`}
-                        >
-                          {addingRecommended === `${rec.title}-${rec.artist}` ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Plus className="w-4 h-4 mr-2" />
-                          )}
-                          Add to Library
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
           </motion.div>
         ) : (
           <motion.div 
