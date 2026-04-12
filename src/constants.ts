@@ -58,6 +58,150 @@ export interface Song {
 
 export const SONGS: Song[] = [
   {
+  id: "best-part",
+  title: "Best Part",
+  artist: "Daniel Caesar & H.E.R.",
+  tuning: "Standard",
+  content: `
+[Intro]
+A#maj7   Fm7   D#maj7   F#maj7
+
+[Verse 1]
+A#maj7
+     You don't know babe
+Fm7
+    When you hold me
+D#maj7
+     And kiss me slowly
+         F#maj7
+It's the sweetest thing
+[Intro]
+A#maj7   Fm7   D#maj7   F#maj7
+ 
+[Verse 1]
+A#maj7
+     You don't know babe
+Fm7
+    When you hold me
+D#maj7
+     And kiss me slowly
+         F#maj7
+It's the sweetest thing
+A#maj7
+     And it don't change
+Fm7
+    If I had it my way
+D#maj7                        F#maj7
+     You would know that you are
+ 
+[Pre-Chorus 1]
+A#maj7
+   You're the coffee that I need in the morning
+Fm7
+  You're my sunshine in the rain when it's pouring
+D#maj7
+   Won't you give yourself to me
+        F#maj7
+Give it all, oh
+ 
+[Chorus]
+             A#maj7
+I just wanna see
+               Fm7                  D#maj7
+I just wanna see how beautiful you are
+                  F#maj7
+You know that I see it
+                 A#maj7
+I know you're a star
+                Fm7
+Where you go I follow
+               D#maj7
+No matter how far
+              F#maj7
+If life is a movie
+                      A#maj7 Fm7
+Oh, you're the best part, oh
+                 D#maj7  F#maj7
+You're the best part, oh
+      A#maj7
+Best part
+ 
+[Verse 2]
+A#maj7
+It's the sunrise
+Fm7
+    And those brown eyes, yes
+D#maj7                        F#maj7
+     You're the one that I desire
+A#maj7
+     When we wake up
+Fm7
+    And then we make love
+D#maj7                    F#maj7
+     It makes me feel so nice
+ 
+[Pre-Chorus 2]
+A#maj7
+   You're my water when I'm stuck in the desert
+Fm7
+  You're the Tylenol I take when my head hurts
+D#maj7                        F#maj7
+   You're the sunshine on my life
+ 
+[Chorus]
+A#maj7               Fm7                  D#maj7
+     I just wanna see how beautiful you are
+                  F#maj7
+You know that I see it
+                 A#maj7
+I know you're a star
+                Fm7
+Where you go I follow
+               D#maj7
+No matter how far
+              F#maj7
+If life is a movie
+                       A#maj7 Fm7
+Then you're the best part, oh
+                 D#maj7  F#maj7
+You're the best part, oh
+      A#maj7
+Best part
+ 
+[Outro]
+A#maj7
+If you love me won't you say something
+Fm7
+  If you love me won't you
+Won't you
+D#maj7
+   If you love me won't you say something
+F#maj7
+    If you love me won't you
+Love me, won't you
+ 
+A#maj7
+   If you love me won't you say something
+Fm7
+  If you love me won't you
+D#maj7
+   If you love me won't you say something
+F#maj7
+    If you love me won't you
+Love me, won't you
+ 
+A#maj7
+   If you love me won't you say something
+Fm7
+  If you love me won't you
+D#maj7
+   If you love me won't you say something
+F#maj7
+    If you love me won't you
+Love me, won't you
+  `
+  },
+  {
     id: "1",
     title: "Wish You Were Here",
     artist: "Pink Floyd",

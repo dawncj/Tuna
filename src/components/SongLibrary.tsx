@@ -128,14 +128,14 @@ export default function SongLibrary() {
                           {importStatus}
                         </div>
                       )}
-                      <Button 
+                      {/* <Button 
                         onClick={handleImportFromUrl} 
                         disabled={isImporting}
                         className="bg-emerald-600 hover:bg-emerald-500 w-full"
                       >
                         {isImporting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Globe className="w-4 h-4 mr-2" />}
                         {isImporting ? 'Importing...' : 'Import Song'}
-                      </Button>
+                      </Button> */}
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -244,56 +244,6 @@ export default function SongLibrary() {
               ))}
             </div>
 
-            {/* Recommendations Section */}
-            <div className="mt-8 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-amber-500" />
-                  AI Recommendations
-                </h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-zinc-800 text-zinc-400 hover:text-amber-500"
-                  onClick={handleGetRecommendations}
-                  disabled={isRecommending}
-                >
-                  {isRecommending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                  {recommendations.length > 0 ? 'Refresh Suggestions' : 'Get Recommendations'}
-                </Button>
-              </div>
-
-              {recommendations.length > 0 && (
-                <div className="grid grid-cols-1 gap-3">
-                  {recommendations.map((rec, idx) => (
-                    <Card key={idx} className="bg-zinc-900/50 border-zinc-800 border-dashed">
-                      <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-zinc-100">{rec.title}</span>
-                            <span className="text-zinc-500 text-sm">— {rec.artist}</span>
-                          </div>
-                          <p className="text-xs text-zinc-500 italic">{rec.reason}</p>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="bg-amber-600 hover:bg-amber-500"
-                          onClick={() => handleAddRecommended(rec.title, rec.artist)}
-                          disabled={addingRecommended === `${rec.title}-${rec.artist}`}
-                        >
-                          {addingRecommended === `${rec.title}-${rec.artist}` ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Plus className="w-4 h-4 mr-2" />
-                          )}
-                          Add to Library
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
           </motion.div>
         ) : (
           <motion.div 
