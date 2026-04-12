@@ -36,8 +36,10 @@ async function startServer() {
       const text = $('body').text().replace(/\s+/g, ' ').trim();
       res.json({ content: text.substring(0, 15000) }); 
     } catch (error: any) {
-      console.error("Error fetching URL:", error.message);
       const status = error.response?.status || 500;
+      if (status !== 403) {
+        console.error("Error fetching URL:", error.message);
+      }
       res.status(status).json({ 
         error: "Failed to fetch URL content", 
         status,
