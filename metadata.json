@@ -1,0 +1,5 @@
+{
+  "name": "StrumTune",
+  "description": "A professional guitar tuner with custom tunings and a song library for lyrics and chords.",
+  "requestFramePermissions": ["microphone"]
+}
