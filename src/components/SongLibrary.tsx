@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SONGS, Song } from '@/src/constants';
 import { transposeLine } from '@/src/lib/chords';
-import { parseSongFromContent, getSongRecommendations, getSongContent, searchAndAddSong } from '@/src/services/geminiService';
 
 export default function SongLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,104 +62,6 @@ export default function SongLibrary() {
     setCustomSongs(updated);
     localStorage.setItem('custom_songs', JSON.stringify(updated));
     if (selectedSong?.id === id) setSelectedSong(null);
-  };
-
-  const handleImportFromUrl = async () => {
-    if (!importUrl) return;
-    setIsImporting(true);
-    setImportStatus("Connecting to website...");
-    try {
-      const fetchRes = await fetch('/api/fetch-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl })
-      });
-      
-      if (fetchRes.ok) {
-        setImportStatus("Analyzing page content...");
-        const { content } = await fetchRes.json();
-        const parsedSong = await parseSongFromContent(content);
-        
-        if (parsedSong.title && parsedSong.content) {
-          const song: Song = {
-            id: Date.now().toString(),
-            title: parsedSong.title,
-            artist: parsedSong.artist || 'Unknown',
-            tuning: parsedSong.tuning || 'Standard',
-            content: parsedSong.content
-          };
-          const updated = [...customSongs, song];
-          setCustomSongs(updated);
-          localStorage.setItem('custom_songs', JSON.stringify(updated));
-          setIsImportDialogOpen(false);
-          setImportUrl('');
-          setImportStatus(null);
-          return;
-        }
-      }
-
-      // Fallback: If fetch fails (e.g. 403) or parsing fails, try searching by URL content/metadata
-      setImportStatus("Site blocked. Using AI to find song details...");
-      const parsedSong = await searchAndAddSong(importUrl);
-      
-      if (parsedSong.title && parsedSong.content) {
-        const song: Song = {
-          id: Date.now().toString(),
-          title: parsedSong.title,
-          artist: parsedSong.artist || 'Unknown',
-          tuning: parsedSong.tuning || 'Standard',
-          content: parsedSong.content
-        };
-        const updated = [...customSongs, song];
-        setCustomSongs(updated);
-        localStorage.setItem('custom_songs', JSON.stringify(updated));
-        setIsImportDialogOpen(false);
-        setImportUrl('');
-        setImportStatus(null);
-      } else {
-        setImportStatus("Failed to find song details. Please try another URL.");
-      }
-    } catch (error) {
-      console.error("Import failed:", error);
-      setImportStatus("An error occurred during import.");
-    } finally {
-      setIsImporting(false);
-      setTimeout(() => setImportStatus(null), 3000);
-    }
-  };
-
-  const handleGetRecommendations = async () => {
-    setIsRecommending(true);
-    try {
-      const recs = await getSongRecommendations(allSongs);
-      setRecommendations(recs);
-    } catch (error) {
-      console.error("Recommendations failed:", error);
-    } finally {
-      setIsRecommending(false);
-    }
-  };
-
-  const handleAddRecommended = async (title: string, artist: string) => {
-    setAddingRecommended(`${title}-${artist}`);
-    try {
-      const content = await getSongContent(title, artist);
-      const song: Song = {
-        id: Date.now().toString(),
-        title,
-        artist,
-        tuning: 'Standard', // Default, content might specify
-        content
-      };
-      const updated = [...customSongs, song];
-      setCustomSongs(updated);
-      localStorage.setItem('custom_songs', JSON.stringify(updated));
-      setRecommendations(prev => prev.filter(r => r.title !== title));
-    } catch (error) {
-      console.error("Failed to add recommended song:", error);
-    } finally {
-      setAddingRecommended(null);
-    }
   };
 
   const formatContent = (content: string, transpose: number) => {
