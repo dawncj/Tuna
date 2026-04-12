@@ -23,6 +23,7 @@ export default function SongLibrary() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Array<{ title: string; artist: string; reason: string }>>([]);
   const [isRecommending, setIsRecommending] = useState(false);
   const [addingRecommended, setAddingRecommended] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export default function SongLibrary() {
   const handleImportFromUrl = async () => {
     if (!importUrl) return;
     setIsImporting(true);
+    setImportStatus("Connecting to website...");
     try {
       const fetchRes = await fetch('/api/fetch-url', {
         method: 'POST',
@@ -75,6 +77,7 @@ export default function SongLibrary() {
       });
       
       if (fetchRes.ok) {
+        setImportStatus("Analyzing page content...");
         const { content } = await fetchRes.json();
         const parsedSong = await parseSongFromContent(content);
         
@@ -91,12 +94,13 @@ export default function SongLibrary() {
           localStorage.setItem('custom_songs', JSON.stringify(updated));
           setIsImportDialogOpen(false);
           setImportUrl('');
+          setImportStatus(null);
           return;
         }
       }
 
       // Fallback: If fetch fails (e.g. 403) or parsing fails, try searching by URL content/metadata
-      console.log("Direct fetch failed or returned no content, trying AI search fallback...");
+      setImportStatus("Site blocked. Using AI to find song details...");
       const parsedSong = await searchAndAddSong(importUrl);
       
       if (parsedSong.title && parsedSong.content) {
@@ -112,11 +116,16 @@ export default function SongLibrary() {
         localStorage.setItem('custom_songs', JSON.stringify(updated));
         setIsImportDialogOpen(false);
         setImportUrl('');
+        setImportStatus(null);
+      } else {
+        setImportStatus("Failed to find song details. Please try another URL.");
       }
     } catch (error) {
       console.error("Import failed:", error);
+      setImportStatus("An error occurred during import.");
     } finally {
       setIsImporting(false);
+      setTimeout(() => setImportStatus(null), 3000);
     }
   };
 
@@ -212,11 +221,16 @@ export default function SongLibrary() {
                         />
                       </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="flex-col gap-3">
+                      {importStatus && (
+                        <div className="text-xs text-emerald-500 font-medium animate-pulse text-center w-full">
+                          {importStatus}
+                        </div>
+                      )}
                       <Button 
                         onClick={handleImportFromUrl} 
                         disabled={isImporting}
-                        className="bg-emerald-600 hover:bg-emerald-500"
+                        className="bg-emerald-600 hover:bg-emerald-500 w-full"
                       >
                         {isImporting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Globe className="w-4 h-4 mr-2" />}
                         {isImporting ? 'Importing...' : 'Import Song'}
