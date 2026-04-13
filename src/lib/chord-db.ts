@@ -1,0 +1,49 @@
+
+export interface ChordFingering {
+  frets: (number | 'x')[];
+  fingers?: (number | null)[];
+  barre?: number;
+}
+
+export const CHORD_DB: Record<string, ChordFingering> = {
+  "C": { frets: ['x', 3, 2, 0, 1, 0], fingers: [null, 3, 2, null, 1, null] },
+  "Cm": { frets: ['x', 3, 5, 5, 4, 3], fingers: [null, 1, 3, 4, 2, 1], barre: 3 },
+  "C7": { frets: ['x', 3, 2, 3, 1, 0], fingers: [null, 3, 2, 4, 1, null] },
+  "D": { frets: ['x', 'x', 0, 2, 3, 2], fingers: [null, null, null, 1, 3, 2] },
+  "Dm": { frets: ['x', 'x', 0, 2, 3, 1], fingers: [null, null, null, 2, 3, 1] },
+  "D7": { frets: ['x', 'x', 0, 2, 1, 2], fingers: [null, null, null, 2, 1, 3] },
+  "E": { frets: [0, 2, 2, 1, 0, 0], fingers: [null, 2, 3, 1, null, null] },
+  "Em": { frets: [0, 2, 2, 0, 0, 0], fingers: [null, 2, 3, null, null, null] },
+  "E7": { frets: [0, 2, 0, 1, 0, 0], fingers: [null, 2, null, 1, null, null] },
+  "F": { frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1], barre: 1 },
+  "Fm": { frets: [1, 3, 3, 1, 1, 1], fingers: [1, 3, 4, 1, 1, 1], barre: 1 },
+  "G": { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, null, null, null, 3] },
+  "Gm": { frets: [3, 5, 5, 3, 3, 3], fingers: [1, 3, 4, 1, 1, 1], barre: 3 },
+  "G7": { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, null, null, null, 1] },
+  "A": { frets: ['x', 0, 2, 2, 2, 0], fingers: [null, null, 1, 2, 3, null] },
+  "Am": { frets: ['x', 0, 2, 2, 1, 0], fingers: [null, null, 2, 3, 1, null] },
+  "A7": { frets: ['x', 0, 2, 0, 2, 0], fingers: [null, null, 1, null, 2, null] },
+  "B": { frets: ['x', 2, 4, 4, 4, 2], fingers: [null, 1, 2, 3, 4, 1], barre: 2 },
+  "Bm": { frets: ['x', 2, 4, 4, 3, 2], fingers: [null, 1, 3, 4, 2, 1], barre: 2 },
+  "B7": { frets: ['x', 2, 1, 2, 0, 2], fingers: [null, 2, 1, 3, null, 4] },
+  "Bb": { frets: ['x', 1, 3, 3, 3, 1], fingers: [null, 1, 2, 3, 4, 1], barre: 1 },
+  "Eb": { frets: ['x', 6, 8, 8, 8, 6], fingers: [null, 1, 2, 3, 4, 1], barre: 6 },
+  "Ab": { frets: [4, 6, 6, 5, 4, 4], fingers: [1, 3, 4, 2, 1, 1], barre: 4 },
+  "Db": { frets: ['x', 4, 6, 6, 6, 4], fingers: [null, 1, 2, 3, 4, 1], barre: 4 },
+  "Gb": { frets: [2, 4, 4, 3, 2, 2], fingers: [1, 3, 4, 2, 1, 1], barre: 2 },
+  "F#": { frets: [2, 4, 4, 3, 2, 2], fingers: [1, 3, 4, 2, 1, 1], barre: 2 },
+  "C#": { frets: ['x', 4, 6, 6, 6, 4], fingers: [null, 1, 2, 3, 4, 1], barre: 4 },
+  "G#": { frets: [4, 6, 6, 5, 4, 4], fingers: [1, 3, 4, 2, 1, 1], barre: 4 },
+  "D#": { frets: ['x', 6, 8, 8, 8, 6], fingers: [null, 1, 2, 3, 4, 1], barre: 6 },
+  "A#": { frets: ['x', 1, 3, 3, 3, 1], fingers: [null, 1, 2, 3, 4, 1], barre: 1 },
+  "Em7": { frets: [0, 2, 2, 0, 3, 0], fingers: [null, 1, 2, null, 4, null] },
+  "Am7": { frets: ['x', 0, 2, 0, 1, 0], fingers: [null, null, 2, null, 1, null] },
+  "Dm7": { frets: ['x', 'x', 0, 2, 1, 1], fingers: [null, null, null, 2, 1, 1], barre: 1 },
+  "G/B": { frets: ['x', 2, 0, 0, 3, 3], fingers: [null, 1, null, null, 3, 4] },
+  "A7sus4": { frets: ['x', 0, 2, 0, 3, 0], fingers: [null, null, 1, null, 3, null] },
+  "Dmaj7": { frets: ['x', 'x', 0, 2, 2, 2], fingers: [null, null, null, 1, 1, 1], barre: 2 },
+  "Bsus2": { frets: ['x', 2, 4, 4, 2, 2], fingers: [null, 1, 3, 4, 1, 1], barre: 2 },
+  "Gsus2": { frets: [3, 5, 5, 3, 3, 3], fingers: [1, 3, 4, 1, 1, 1], barre: 3 },
+  "D#dim7": { frets: ['x', 'x', 1, 2, 1, 2], fingers: [null, null, 1, 3, 2, 4] },
+  "C#dim7": { frets: ['x', 'x', 2, 3, 2, 3], fingers: [null, null, 1, 3, 2, 4] },
+};
