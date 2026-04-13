@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Music, ChevronRight, ArrowLeft, BookOpen, Guitar, Plus, Minus, Save, Trash2, Globe, Sparkles, Loader2 } from 'lucide-react';
+import { Search, Music, ChevronRight, ArrowLeft, BookOpen, Guitar, Plus, Minus, Save, Trash2, Globe, Sparkles, Loader2, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SONGS, Song } from '@/src/constants';
 import { transposeLine } from '@/src/lib/chords';
+import { ChordDiagram } from './ChordDiagram';
 
 export default function SongLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +27,8 @@ export default function SongLibrary() {
   const [recommendations, setRecommendations] = useState<Array<{ title: string; artist: string; reason: string }>>([]);
   const [isRecommending, setIsRecommending] = useState(false);
   const [addingRecommended, setAddingRecommended] = useState<string | null>(null);
+  const [activeChord, setActiveChord] = useState<string | null>(null);
+
 
   // New song form state
   const [newSong, setNewSong] = useState({ title: '', artist: '', tuning: 'Standard', content: '' });
@@ -75,7 +78,24 @@ export default function SongLibrary() {
         return <div key={i} className="text-emerald-500 font-bold mt-4 mb-1 text-sm uppercase tracking-wider">{transposedLine}</div>;
       }
       if (isChordLine) {
-        return <div key={i} className="text-amber-500 font-bold font-mono text-lg leading-none py-1">{transposedLine}</div>;
+        // Split by spaces but preserve them for positioning
+        const parts = transposedLine.split(/(\s+)/);
+        return (
+          <div key={i} className="text-amber-500 font-bold font-mono text-lg leading-none py-1 flex flex-wrap">
+            {parts.map((part, j) => {
+              if (part.trim() === '') return <span key={j} className="whitespace-pre">{part}</span>;
+              return (
+                <button 
+                  key={j} 
+                  onClick={() => setActiveChord(activeChord === part ? null : part)}
+                  className={`hover:text-amber-400 transition-colors cursor-pointer relative ${activeChord === part ? 'text-emerald-500' : ''}`}
+                >
+                  {part}
+                </button>
+              );
+            })}
+          </div>
+        );
       }
       return <div key={i} className="text-zinc-300 min-h-[1.5rem]">{transposedLine}</div>;
     });
@@ -315,13 +335,44 @@ export default function SongLibrary() {
               <p className="text-xl text-zinc-500 font-medium">{selectedSong.artist}</p>
             </div>
 
-            <Card className="bg-zinc-950 border-zinc-800 flex-1 overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-350px)] p-8">
-                <div className="font-sans whitespace-pre-wrap leading-relaxed max-w-2xl mx-auto">
-                  {formatContent(selectedSong.content, transposition)}
-                </div>
-              </ScrollArea>
-            </Card>
+            <div className="flex flex-col md:flex-row gap-6 h-full">
+              <Card className="bg-zinc-950 border-zinc-800 flex-1 overflow-hidden">
+                <ScrollArea className="h-[calc(100vh-350px)] p-8">
+                  <div className="font-sans whitespace-pre-wrap leading-relaxed max-w-2xl mx-auto">
+                    {formatContent(selectedSong.content, transposition)}
+                  </div>
+                </ScrollArea>
+              </Card>
+
+              <AnimatePresence>
+                {activeChord && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="w-full md:w-64"
+                  >
+                    <div className="sticky top-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Chord Reference</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-zinc-500 hover:text-zinc-100"
+                          onClick={() => setActiveChord(null)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <ChordDiagram chordName={activeChord} />
+                      <p className="mt-4 text-xs text-zinc-500 leading-relaxed italic">
+                        Click any chord in the song to see its fingering diagram.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
