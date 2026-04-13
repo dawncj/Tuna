@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { CHORD_DB, ChordFingering } from '../lib/chord-db';
+import { getSimplifiedChord } from '../lib/chords';
+import { getRelativeChord } from '../lib/chords';
+import { Search, Music, ChevronRight, ArrowLeft, BookOpen, Guitar, Plus, Minus, Save, Trash2, Globe, Sparkles, Loader2, X } from 'lucide-react';
 
 interface ChordDiagramProps {
   chordName: string;
@@ -8,12 +11,88 @@ interface ChordDiagramProps {
 }
 
 export const ChordDiagram: React.FC<ChordDiagramProps> = ({ chordName, className }) => {
-  // Clean chord name for lookup (e.g., remove variations like /B if not found)
-  let lookupName = chordName.trim();
-  let fingering = CHORD_DB[lookupName];
+  React.useEffect(() => {
+    setMode('original');
+  }, [chordName]);
+  type Mode = 'original' | 'simplified' | 'relative';
+  const [mode, setMode] = React.useState<Mode>('original');
 
-  if (!fingering && lookupName.includes('/')) {
-    lookupName = lookupName.split('/')[0];
+  function getValidModes(original: string): Mode[] {
+    const simplified = getSimplifiedChord(original);
+    const relative = getRelativeChord(original);
+    const modes: Mode[] = [];
+
+    // Always try original
+    if (CHORD_DB[original]) {
+      modes.push('original');
+    }
+
+    // Only add simplified if it's DIFFERENT
+    if (
+      simplified &&
+      simplified !== original &&
+      CHORD_DB[simplified]
+    ) {
+      modes.push('simplified');
+    }
+
+    // Only add relative if it's DIFFERENT from both
+    if (
+      relative &&
+      relative !== original &&
+      relative !== simplified &&
+      CHORD_DB[relative]
+    ) {
+      modes.push('relative');
+    }
+
+    return modes; 
+  }
+  const original = chordName.trim();
+  const simplified = getSimplifiedChord(original);
+  const relative = getRelativeChord(original);
+  const modes = getValidModes(original);
+  const validModes = getValidModes(original);
+
+  // fallback: if nothing valid, still try original
+  const safeModes = validModes.length > 0 ? validModes : ['original'];
+
+  const currentIndex = safeModes.indexOf(mode);
+  const safeMode = (currentIndex === -1 ? safeModes[0] : mode) as Mode;
+  const chordMap: Record<Mode, string | null> = {
+    original,
+    simplified,
+    relative,
+  };
+
+  const displayedChord = chordMap[safeMode];
+
+  function nextMode() {
+    const modes = getValidModes(original);
+    if (modes.length === 0) return;
+
+    const currentIndex = modes.indexOf(mode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+
+    setMode(modes[nextIndex]);
+  }
+
+  function prevMode() {
+    const modes = getValidModes(original);
+    if (modes.length === 0) return;
+
+    const currentIndex = modes.indexOf(mode);
+    const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
+
+    setMode(modes[prevIndex]);
+  }
+
+  // Clean chord name for lookup (e.g., remove variations like /B if not found)
+  let fingering = CHORD_DB[displayedChord];
+  let effectiveMode: Mode = safeMode;
+
+  if (!fingering && displayedChord.includes('/')) {
+    const lookupName = displayedChord.split('/')[0];
     fingering = CHORD_DB[lookupName];
   }
 
@@ -45,7 +124,42 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({ chordName, className
 
   return (
     <div className={`bg-zinc-900 rounded-lg p-4 border border-zinc-800 shadow-xl ${className}`}>
-      <h3 className="text-center font-bold text-emerald-500 mb-2 text-lg">{chordName}</h3>
+      <div className="flex items-center justify-between mb-2">
+        {/* ⬅ LEFT */}
+        {modes.length > 1 ? (
+            <button
+            onClick={prevMode}
+            className="text-zinc-500 hover:text-emerald-500"
+            >
+            <ChevronRight className="w-5 h-5 rotate-180" />
+            </button>
+        ) : (
+            <div className="w-5" /> // keeps layout aligned
+        )}
+
+        {/* 🎸 CENTER */}
+        <div className="flex flex-col items-center">
+            <span className="font-bold text-emerald-500 text-lg">
+            {displayedChord}
+            </span>
+
+            <span className="text-[10px] text-zinc-500 uppercase">
+            {effectiveMode}
+            </span>
+        </div>
+
+        {/* ➡ RIGHT */}
+        {modes.length > 1 ? (
+            <button
+            onClick={nextMode}
+            className="text-zinc-500 hover:text-emerald-500"
+            >
+            <ChevronRight className="w-5 h-5 text-zinc-700 hover:text-emerald-500 transition-colors" />
+            </button>
+        ) : (
+            <div className="w-5" />
+        )}
+        </div>
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto">
         {/* Nut or Fret Number */}
         {startFret === 1 ? (
@@ -59,7 +173,7 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({ chordName, className
             x={margin.left - 10} y={margin.top + 15} 
             fill="white" fontSize="12" textAnchor="end"
           >
-            {startFret}fr
+            {startFret}
           </text>
         )}
 

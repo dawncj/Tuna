@@ -29,3 +29,35 @@ export function transposeLine(line: string, semitones: number): string {
     return transposeChord(match, semitones);
   });
 }
+
+export function isMinorChord(chord: string): boolean {
+  // matches "Am", "Am7", "Amin", but NOT "Amaj"
+  return /(^|[^a-zA-Z])([A-G][b#]?m)(?!aj)/.test(chord);
+}
+
+export function getRelativeChord(chord: string): string | null {
+  if (!chord) return null;
+
+  if (isMinorChord(chord)) {
+    // minor → major (+3)
+    return transposeChord(chord, 3).replace(/m(?!aj)/, '');
+  } else {
+    // major → minor (-3)
+    return transposeChord(chord, -3) + 'm';
+  }
+}
+
+export function getChordRoot(chord: string) {
+  const match = chord.match(/^([A-G][b#]?)/);
+  return match ? match[1] : chord;
+}
+
+export function getSimplifiedChord(chord: string) {
+  const root = getChordRoot(chord);
+
+  if (chord.includes('m') && !chord.includes('maj')) {
+    return root + 'm'; // preserve minor
+  }
+
+  return root;
+}

@@ -17,6 +17,7 @@ export const CHORD_DB: Record<string, ChordFingering> = {
   "E7": { frets: [0, 2, 0, 1, 0, 0], fingers: [null, 2, null, 1, null, null] },
   "F": { frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1], barre: 1 },
   "Fm": { frets: [1, 3, 3, 1, 1, 1], fingers: [1, 3, 4, 1, 1, 1], barre: 1 },
+  "Fm7": { frets: [1, 3, 1, 1, 1, 1], fingers: [1, 3, 1, 1, 1, 1], barre: 1 },
   "G": { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, null, null, null, 3] },
   "Gm": { frets: [3, 5, 5, 3, 3, 3], fingers: [1, 3, 4, 1, 1, 1], barre: 3 },
   "G7": { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, null, null, null, 1] },
