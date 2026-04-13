@@ -22,6 +22,11 @@ export const TUNINGS: Tuning[] = [
     frequencies: [82.41, 110.00, 146.83, 196.00, 246.94, 329.63]
   },
   {
+    name: "Open D",
+    notes: ["D2", "A2", "D3", "F#3", "A3", "D4"],
+    frequencies: [73.42, 110.00, 146.83, 185.00, 220.00, 293.66]
+  },
+  {
     name: "Drop D",
     notes: ["D2", "A2", "D3", "G3", "B3", "E4"],
     frequencies: [73.42, 110.00, 146.83, 196.00, 246.94, 329.63]
@@ -40,11 +45,6 @@ export const TUNINGS: Tuning[] = [
     name: "Half Step Down",
     notes: ["Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4"],
     frequencies: [77.78, 103.83, 138.59, 185.00, 233.08, 311.13]
-  },
-  {
-    name: "DADFAD",
-    notes: ["D2", "A2", "D3", "F3", "A3", "D4"],
-    frequencies: [73.42, 110.00, 146.83, 174.61, 220.00, 293.66]
   }
 ];
 
